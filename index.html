@@ -1,0 +1,1225 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pendaftaran Ekskul SMP PGRI Citeureup</title>
+  <!-- Google Fonts: Inter -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+    rel="stylesheet">
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- React & ReactDOM CDN -->
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  <!-- Babel CDN untuk mengompilasi JSX secara langsung di browser -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f8fafc;
+    }
+
+    /* Kustomisasi scrollbar melengkung premium */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+      border-radius: 9999px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 9999px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #3b82f6;
+    }
+
+    /* Sistem Animasi Lanjutan */
+    .animate-fade-in-up {
+      animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .animate-float {
+      animation: floatEffect 4s ease-in-out infinite;
+    }
+
+    .animate-pulse-slow {
+      animation: pulseSlow 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+
+    .animate-shimmer {
+      background: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.4) 50%, rgba(255, 255, 255, 0) 100%);
+      background-size: 200% 100%;
+      animation: shimmerEffect 2.5s infinite;
+    }
+
+    .animate-scale-in {
+      animation: scaleIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(24px) scale(0.98);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    @keyframes floatEffect {
+
+      0%,
+      100% {
+        transform: translateY(0px) rotate(0deg);
+      }
+
+      50% {
+        transform: translateY(-10px) rotate(2deg);
+      }
+    }
+
+    @keyframes pulseSlow {
+
+      0%,
+      100% {
+        box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.2);
+      }
+
+      50% {
+        box-shadow: 0 0 0 15px rgba(59, 130, 246, 0);
+      }
+    }
+
+    @keyframes shimmerEffect {
+      0% {
+        background-position: -200% 0;
+      }
+
+      100% {
+        background-position: 200% 0;
+      }
+    }
+
+    @keyframes scaleIn {
+      from {
+        opacity: 0;
+        transform: scale(0.92);
+      }
+
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    /* Efek transisi interaktif */
+    .smooth-transition {
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .card-hover-effect:hover {
+      transform: translateY(-6px) scale(1.02);
+      box-shadow: 0 20px 25px -5px rgba(59, 130, 246, 0.1), 0 10px 10px -5px rgba(59, 130, 246, 0.04);
+      border-color: #93c5fd;
+    }
+  </style>
+</head>
+
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col justify-between">
+
+  <div id="root"></div>
+
+  <!-- Import Supabase Client via ESM (Modul Browser) -->
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+    window.createClient = createClient; // Mengekspor client Supabase ke object window global
+  </script>
+
+  <!-- Kode React/JSX -->
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+
+    // =========================================================================
+    // KONFIGURASI SUPABASE (KUNCI ANON ANDA TELAH DIMASUKKAN)
+    // =========================================================================
+    const SUPABASE_URL = 'https://xiafplsziwxfnfvvjvae.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_qbuZfP0ETDufQ1KiskaROw_i-Ab_tUD'; // Anon key berhasil diintegrasikan
+
+    let supabase = null;
+    try {
+      if (window.createClient && SUPABASE_URL && SUPABASE_ANON_KEY && SUPABASE_ANON_KEY !== 'YOUR_SUPABASE_ANON_KEY') {
+        supabase = window.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      }
+    } catch (e) {
+      console.warn("Gagal inisialisasi Supabase SDK, menjalankan sistem dalam mode Local/Offline.");
+    }
+
+    const safeLocalStorage = {
+      getItem: (key) => {
+        try { return localStorage.getItem(key); } catch (e) { return null; }
+      },
+      setItem: (key, value) => {
+        try { localStorage.setItem(key, value); } catch (e) { }
+      }
+    };
+
+    // Icons
+    const IconShield = ({ className = "w-5 h-5" }) => <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" /></svg>;
+    const IconLock = ({ className = "w-5 h-5" }) => <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" /></svg>;
+    const IconHome = ({ className = "w-5 h-5" }) => <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" /></svg>;
+    const IconLogOut = ({ className = "w-5 h-5" }) => <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75" /></svg>;
+    const IconPlus = ({ className = "w-5 h-5" }) => <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>;
+    const IconTrash = ({ className = "w-5 h-5" }) => <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" /></svg>;
+    const IconInfo = ({ className = "w-5 h-5" }) => <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>;
+    const IconSearch = ({ className = "w-5 h-5" }) => <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.637 10.637z" /></svg>;
+    const IconDownload = ({ className = "w-5 h-5" }) => <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" /></svg>;
+    const IconEdit = ({ className = "w-5 h-5" }) => <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.125 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" /></svg>;
+    const IconX = ({ className = "w-5 h-5" }) => <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>;
+    const IconEye = ({ className = "w-5 h-5" }) => <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" /><path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>;
+    const IconPrinter = ({ className = "w-5 h-5" }) => <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M6.72 13.82l-.24 2.238a2.25 2.25 0 002.233 2.49h6.574a2.25 2.25 0 002.233-2.49l-.24-2.238m-10.56 0A2.25 2.25 0 014.5 11.583V8.87a2.25 2.25 0 012.25-2.25h10.5a2.25 2.25 0 012.25 2.25v2.713a2.25 2.25 0 01-2.233 2.238m-10.56 0h10.56M9 3h6v3H9V3z" /></svg>;
+    const IconCalendar = ({ className = "w-5 h-5" }) => <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5m-9-6h.008v.008H12v-.008zM12 15h.008v.008H12V15zm0 2.25h.008v.008H12v-.008zM9.75 15h.008v.008H9.75V15zm0 2.25h.008v.008H9.75v-.008zM7.5 15h.008v.008H7.5V15zm0 2.25h.008v.008H7.5v-.008zm6.75-4.5h.008v.008h-.008v-.008zm0 2.25h.008v.008h-.008V15zm0 2.25h.008v.008h-.008v-.008zm2.25-4.5h.008v.008H16.5v-.008zm0 2.25h.008v.008H16.5V15z" /></svg>;
+    const IconLocation = ({ className = "w-5 h-5" }) => <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25s-7.5-4.108-7.5-11.25a7.5 7.5 0 1115 0z" /></svg>;
+
+    // Seluruh data 15 ekskul asli Anda dipulihkan di sini
+    const DEFAULT_EKSKUL_LIST = [
+      { id: 1, name: "Pramuka", pembina: "Kak Heri S.", phone: "6281234567801", groupLink: "https://chat.whatsapp.com/EkskulPramukaPGRI2026", desc: "Melatih kepanduan, kemandirian, kedisiplinan, and dasadharma pramuka.", category: "Wajib/Semi-Militer", jadwal: "Sabtu, 11:00 - 13:00 WIB", lokasi: "Lapangan Utama Sekolah" },
+      { id: 2, name: "Paskibra", pembina: "Kang Dani R.", phone: "6281234567802", groupLink: "https://chat.whatsapp.com/EkskulPaskibraPGRI2026", desc: "Pembentukan karakter tangguh, kedisiplinan baris-berbaris, and cinta tanah air.", category: "Semi-Militer", jadwal: "Rabu, 15:30 - 17:00 WIB", lokasi: "Lapangan Utama Sekolah" },
+      { id: 3, name: "PMR", pembina: "Ibu Siti Nurhaliza", phone: "6281234567803", groupLink: "https://chat.whatsapp.com/EkskulPMRPGRI2026", desc: "Belajar penanganan medis pertama, kesehatan remaja, and aksi kemানুsiaan.", category: "Sosial", jadwal: "Kamis, 15:30 - 17:00 WIB", lokasi: "Ruang UKS & Aula" },
+      { id: 4, name: "Futsal", pembina: "Pak Aris Munandar", phone: "6281234567804", groupLink: "https://chat.whatsapp.com/EkskulFutsalPGRI2026", desc: "Mengembangkan teknik bermain bola, kerja sama tim futsal, and taktik turnamen.", category: "Olahraga", jadwal: "Selasa & Jumat, 16:00 - 17:30 WIB", lokasi: "Lapangan Futsal PGRI" },
+      { id: 5, name: "Basket", pembina: "Pak Rian Hidayat", phone: "6281234567805", groupLink: "https://chat.whatsapp.com/EkskulBasketPGRI2026", desc: "Mengasih kemampuan fisik, dribbling, shooting, and kerja sama tim basket.", category: "Olahraga", jadwal: "Senin & Kamis, 16:00 - 17:30 WIB", lokasi: "Lapangan Basket PGRI" },
+      { id: 6, name: "Voli", pembina: "Pak Doni Irawan", phone: "6281234567806", groupLink: "https://chat.whatsapp.com/EkskulVoliPGRI2026", desc: "Melatih teknik servis, smash, passing, and kekompakan tim bola voli.", category: "Olahraga", jadwal: "Rabu, 16:00 - 17:30 WIB", lokasi: "Lapangan Voli Sekolah" },
+      { id: 7, name: "Badminton", pembina: "Pak Yusuf Al-Fatih", phone: "6281234567807", groupLink: "https://chat.whatsapp.com/EkskulBadmintonPGRI2026", desc: "Mengembangkan bakat tepok bulu tangkis secara tunggal maupun ganda.", category: "Olahraga", jadwal: "Sabtu, 08:00 - 10:00 WIB", lokasi: "Gedung Serbaguna (GSG)" },
+      { id: 8, name: "Karate", pembina: "Senpai Rahmat", phone: "6281234567808", groupLink: "https://chat.whatsapp.com/EkskulKaratePGRI2026", desc: "Melatih beladiri fisik asal Jepang, pertahanan diri, and kedisiplinan mental.", category: "Beladiri", jadwal: "Jumat, 15:30 - 17:00 WIB", lokasi: "Aula Utama Sekolah" },
+      { id: 9, name: "Silat", pembina: "Kang Cecep", phone: "6281234567809", groupLink: "https://chat.whatsapp.com/EkskulSilatPGRI2026", desc: "Melestarikan budaya bangsa melalui seni beladiri tradisional Pencak Silat.", category: "Beladiri", jadwal: "Selasa, 15:30 - 17:00 WIB", lokasi: "Aula Belakang Sekolah" },
+      { id: 10, name: "Paduan Suara", pembina: "Ibu Maria", phone: "6281234567810", groupLink: "https://chat.whatsapp.com/EkskulPadusPGRI2026", desc: "Melatih olah vokal kelompok, harmonisasi nada, and persiapan upacara/lomba.", category: "Seni", jadwal: "Senin, 15:30 - 17:00 WIB", lokasi: "Ruang Musik" },
+      { id: 11, name: "Tari", pembina: "Ibu Sekar Wangi", phone: "6281234567811", groupLink: "https://chat.whatsapp.com/EkskulTariPGRI2026", desc: "Mempelajari tari kreasi nusantara, tari tradisional, serta seni pertunjukan.", category: "Seni", jadwal: "Kamis, 15:30 - 17:00 WIB", lokasi: "Sanggar Seni Sekolah" },
+      { id: 12, name: "Club IT", pembina: "Pak Budi Utomo", phone: "6281234567812", groupLink: "https://chat.whatsapp.com/EkskulClubITPGRI2026", desc: "Mempelajari dasar komputer, desain grafis (Canva/Photoshop), and pemrograman web.", category: "Sains & Teknologi", jadwal: "Selasa, 15:30 - 17:00 WIB", lokasi: "Laboratorium Komputer" },
+      { id: 13, name: "Marawis", pembina: "Ust. Ahmad Syafi'i", phone: "6281212345678", groupLink: "https://chat.whatsapp.com/IoAXq2qEwqx1BmS34px3KO", desc: "Meningkatkan kecintaan terhadap seni musik islami rebana and marawis.", category: "Seni Keagamaan", jadwal: "Jumat, 13:30 - 15:00 WIB", lokasi: "Mushola Al-Hijrah PGRI" },
+      { id: 14, name: "Tahfidz", pembina: "Ustz. Aminah Al-Anshori", phone: "6281234567814", groupLink: "https://chat.whatsapp.com/EkskulTahfidzPGRI2026", desc: "Bimbingan hafalan Al-Qur'an Juz 30 and tahsin bacaan secara intensif.", category: "Sains & Keagamaan", jadwal: "Rabu, 15:30 - 17:00 WIB", lokasi: "Mushola Al-Hijrah PGRI" },
+      { id: 15, name: "Angklung", pembina: "Pak Dadang", phone: "6281234567815", groupLink: "https://chat.whatsapp.com/EkskulAngklungPGRI2026", desc: "Mempelajari seni alat musik bambu tradisional Jawa Barat secara berkelompok.", category: "Seni", jadwal: "Sabtu, 13:00 - 15:00 WIB", lokasi: "Aula Belakang Sekolah" }
+    ];
+
+    const KATEGORI_COLORS = {
+      "Wajib/Semi-Militer": "bg-blue-900 text-white border-blue-950",
+      "Semi-Militer": "bg-blue-100 text-blue-800 border-blue-300",
+      "Sosial": "bg-sky-100 text-sky-800 border-sky-300",
+      "Olahraga": "bg-indigo-50 text-indigo-700 border-indigo-200",
+      "Beladiri": "bg-slate-100 text-slate-800 border-slate-300",
+      "Seni": "bg-blue-50 text-blue-900 border-blue-200",
+      "Sains & Teknologi": "bg-cyan-100 text-cyan-800 border-cyan-300",
+      "Seni Keagamaan": "bg-slate-200 text-slate-900 border-slate-300",
+      "Sains & Keagamaan": "bg-blue-100 text-blue-900 border-blue-300"
+    };
+
+    const INITIAL_APPLICANTS = [
+      { id: "REG/ESK/2026/001", nama: "Muhammad Rafi", kelas: "VIII-A", gender: "Laki-laki", whatsapp: "081234567890", ekskul1: "Futsal", alasan1: "Ingin mengasah kemampuan fisik dan teknik sepakbola saya.", ekskul2: "Club IT", alasan2: "Sangat suka bermain komputer dan ingin belajar cara mendesain.", tanggal: "2026-07-04", status: "Terverifikasi" },
+      { id: "REG/ESK/2026/002", nama: "Siti Rahmawati", kelas: "VII-C", gender: "Perempuan", whatsapp: "085678901234", ekskul1: "Tari", alasan1: "Sudah belajar tari piring sejak SD dan ingin melestarikan tari daerah.", ekskul2: "PMR", alasan2: "Tertarik dengan pertolongan pertama dan ingin berkontribusi sosial.", tanggal: "2026-07-05", status: "Terverifikasi" }
+    ];
+
+    const KELAS_OPTIONS = [
+      "VII-A", "VII-B", "VII-C", "VII-D", "VII-E", "VII-F", "VII-G", "VII-H",
+      "VIII-A", "VIII-B", "VIII-C", "VIII-D", "VIII-E", "VIII-F", "VIII-G", "VIII-H",
+      "IX-A", "IX-B", "IX-C", "IX-D", "IX-E", "IX-F", "IX-G", "IX-H"
+    ];
+
+    function App() {
+      const [currentView, setCurrentView] = useState('landing');
+      const [formStep, setFormStep] = useState(1);
+
+      const [ekskulList, setEkskulList] = useState(() => {
+        const saved = safeLocalStorage.getItem('pgri_ekskul_data_v3');
+        return saved ? JSON.parse(saved) : DEFAULT_EKSKUL_LIST;
+      });
+
+      const [applicants, setApplicants] = useState(() => {
+        const saved = safeLocalStorage.getItem('pgri_applicants_data_v3');
+        return saved ? JSON.parse(saved) : INITIAL_APPLICANTS;
+      });
+
+      const [syncStatus, setSyncStatus] = useState('connecting'); // 'connecting' | 'synced' | 'error'
+
+      const [selectedApplicant, setSelectedApplicant] = useState(null);
+      const [adminPassword, setAdminPassword] = useState('');
+      const [adminError, setAdminError] = useState('');
+      const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(false);
+      const [adminTab, setAdminTab] = useState('data');
+
+      const [choiceTab, setChoiceTab] = useState('all');
+      const [selectedFilterEkskul, setSelectedFilterEkskul] = useState('');
+
+      const [toastMessage, setToastMessage] = useState('');
+      const [showToast, setShowToast] = useState(false);
+
+      const [searchTerm, setSearchTerm] = useState('');
+      const [filterStatus, setFilterStatus] = useState('');
+
+      const [gallerySearch, setGallerySearch] = useState('');
+
+      const [editingEkskul, setEditingEkskul] = useState(null);
+      const [showAddEkskulModal, setShowAddEkskulModal] = useState(false);
+      const [newEkskul, setNewEkskul] = useState({
+        name: '', pembina: '', phone: '', groupLink: '', desc: '', category: 'Olahraga', jadwal: '', lokasi: ''
+      });
+      const [deletingApplicantId, setDeletingApplicantId] = useState(null);
+
+      const [expandedEkskulId, setExpandedEkskulId] = useState(null);
+
+      const [formData, setFormData] = useState({
+        nama: '', kelas: '', gender: '', whatsapp: '',
+        ekskul1: '', alasan1: '', ekskul2: '', alasan2: '', pernyataan: false
+      });
+
+      const [lastSubmission, setLastSubmission] = useState(null);
+
+      // =========================================================
+      // SUPABASE: SINKRONISASI DATA AWAL & REALTIME SUBSCRIPTION
+      // =========================================================
+      useEffect(() => {
+        if (!supabase) {
+          setSyncStatus('error');
+          return;
+        }
+
+        const fetchInitialData = async () => {
+          try {
+            // Fetch Ekskul dari Supabase
+            const { data: eksData, error: eksErr } = await supabase
+              .from('ekskulList')
+              .select('*')
+              .order('id', { ascending: true });
+
+            if (eksErr) throw eksErr;
+
+            if (eksData && eksData.length > 0) {
+              setEkskulList(eksData);
+            } else if (eksData && eksData.length === 0) {
+              // Jika tabel kosong di cloud, migrasikan data default secara otomatis
+              for (const item of DEFAULT_EKSKUL_LIST) {
+                await supabase.from('ekskulList').insert(item);
+              }
+              setEkskulList(DEFAULT_EKSKUL_LIST);
+            }
+
+            // Fetch Applicants dari Supabase
+            const { data: appData, error: appErr } = await supabase
+              .from('applicants')
+              .select('*')
+              .order('id', { ascending: false });
+
+            if (appErr) throw appErr;
+            if (appData) setApplicants(appData);
+
+            setSyncStatus('synced');
+          } catch (error) {
+            console.error("Gagal sinkronisasi data dengan Supabase:", error);
+            setSyncStatus('error');
+          }
+        };
+
+        fetchInitialData();
+
+        // Mengaktifkan Listener Real-time di Supabase
+        const ekskulChannel = supabase.channel('custom-ekskul-channel')
+          .on('postgres_changes', { event: '*', schema: 'public', table: 'ekskulList' }, (payload) => {
+            supabase.from('ekskulList').select('*').order('id', { ascending: true })
+              .then(({ data }) => { if (data) setEkskulList(data); });
+          })
+          .subscribe();
+
+        const applicantsChannel = supabase.channel('custom-applicants-channel')
+          .on('postgres_changes', { event: '*', schema: 'public', table: 'applicants' }, (payload) => {
+            supabase.from('applicants').select('*').order('id', { ascending: false })
+              .then(({ data }) => { if (data) setApplicants(data); });
+          })
+          .subscribe();
+
+        return () => {
+          supabase.removeChannel(ekskulChannel);
+          supabase.removeChannel(applicantsChannel);
+        };
+      }, []);
+
+      useEffect(() => {
+        safeLocalStorage.setItem('pgri_ekskul_data_v3', JSON.stringify(ekskulList));
+      }, [ekskulList]);
+
+      useEffect(() => {
+        safeLocalStorage.setItem('pgri_applicants_data_v3', JSON.stringify(applicants));
+      }, [applicants]);
+
+      const triggerToast = (msg) => {
+        setToastMessage(msg);
+        setShowToast(true);
+        setTimeout(() => setShowToast(false), 4000);
+      };
+
+      const resetForm = () => {
+        setFormData({ nama: '', kelas: '', gender: '', whatsapp: '', ekskul1: '', alasan1: '', ekskul2: '', alasan2: '', pernyataan: false });
+        setFormStep(1);
+        setLastSubmission(null);
+        setCurrentView('landing');
+      };
+
+      const handleFastRegister = (ekskulName) => {
+        setFormData(prev => ({ ...prev, ekskul1: ekskulName }));
+        setCurrentView('form');
+        setFormStep(1);
+        window.scrollTo(0, 0);
+        triggerToast(`Ekskul "${ekskulName}" terpilih otomatis sebagai Pilihan Utama!`);
+      };
+
+      const handleInputChange = (e) => {
+        const { name, value, type, checked } = e.target;
+        setFormData(prev => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
+      };
+
+      const nextStep = () => {
+        if (formStep === 1) {
+          if (!formData.nama || !formData.kelas || !formData.gender || !formData.whatsapp) {
+            triggerToast("Harap lengkapi semua data diri wajib!");
+            return;
+          }
+        } else if (formStep === 2) {
+          if (!formData.ekskul1 || !formData.ekskul2) {
+            triggerToast("Anda wajib memilih tepat 2 ekstrakurikuler!");
+            return;
+          }
+          if (formData.ekskul1 === formData.ekskul2) {
+            triggerToast("Pilihan Ekskul Utama dan Kedua tidak boleh sama!");
+            return;
+          }
+          if (!formData.alasan1 || !formData.alasan2) {
+            triggerToast("Harap isi alasan memilih untuk kedua ekskul!");
+            return;
+          }
+        }
+        setFormStep(prev => prev + 1);
+        window.scrollTo(0, 0);
+      };
+
+      const prevStep = () => {
+        setFormStep(prev => prev - 1);
+        window.scrollTo(0, 0);
+      };
+
+      const handleSubmit = async (e) => {
+        e.preventDefault();
+        if (!formData.pernyataan) {
+          triggerToast("Anda harus menyetujui pernyataan kesiapan!");
+          return;
+        }
+
+        const newRegId = `REG/ESK/2026/${String(applicants.length + 1).padStart(3, '0')}`;
+        const today = new Date().toISOString().split('T')[0];
+
+        const submission = {
+          id: newRegId,
+          nama: formData.nama,
+          kelas: formData.kelas,
+          gender: formData.gender,
+          whatsapp: formData.whatsapp,
+          ekskul1: formData.ekskul1,
+          alasan1: formData.alasan1,
+          ekskul2: formData.ekskul2,
+          alasan2: formData.alasan2,
+          tanggal: today,
+          status: "Terverifikasi"
+        };
+
+        if (supabase) {
+          try {
+            const { error } = await supabase.from('applicants').insert(submission);
+            if (error) throw error;
+
+            setLastSubmission(submission);
+            setCurrentView('success');
+            window.scrollTo(0, 0);
+            triggerToast("Pendaftaran berhasil disimpan ke Supabase Database!");
+          } catch (err) {
+            console.error("Gagal simpan pendaftaran cloud:", err);
+            // Fallback penyimpanan lokal sementara
+            setApplicants([submission, ...applicants]);
+            setLastSubmission(submission);
+            setCurrentView('success');
+            window.scrollTo(0, 0);
+            triggerToast("Koneksi gagal. Tersimpan lokal sementara.");
+          }
+        } else {
+          setApplicants([submission, ...applicants]);
+          setLastSubmission(submission);
+          setCurrentView('success');
+          window.scrollTo(0, 0);
+          triggerToast("Pendaftaran disimpan secara lokal (Sistem offline)");
+        }
+      };
+
+      const handleAdminLoginSubmit = (e) => {
+        e.preventDefault();
+        if (adminPassword === 'pembinaosis2026') {
+          setIsAdminAuthenticated(true);
+          setAdminError('');
+          setAdminPassword('');
+          triggerToast("Selamat Datang, Admin Pembina OSIS!");
+        } else {
+          setAdminError("Kata sandi salah! Silakan coba lagi.");
+        }
+      };
+
+      const deleteApplicantConfirm = async (id) => {
+        if (supabase) {
+          try {
+            const { error } = await supabase.from('applicants').delete().eq('id', id);
+            if (error) throw error;
+            triggerToast("Pendaftar berhasil dihapus dari Database.");
+          } catch (err) {
+            console.error(err);
+            triggerToast("Gagal menghapus dari Database.");
+          }
+        } else {
+          setApplicants(prev => prev.filter(app => app.id !== id));
+          triggerToast("Pendaftar berhasil dihapus secara lokal.");
+        }
+        setDeletingApplicantId(null);
+        setSelectedApplicant(null);
+      };
+
+      const saveEkskulEdit = async (e) => {
+        e.preventDefault();
+
+        if (supabase) {
+          try {
+            const { error } = await supabase.from('ekskulList').update(editingEkskul).eq('id', editingEkskul.id);
+            if (error) throw error;
+            triggerToast("Data ekskul berhasil diperbarui di Database!");
+          } catch (err) {
+            console.error("Gagal update ekskul cloud:", err);
+            triggerToast("Gagal update. Perubahan hanya tersimpan lokal.");
+          }
+        } else {
+          setEkskulList(prev => prev.map(item => item.id === editingEkskul.id ? editingEkskul : item));
+          triggerToast("Data ekskul berhasil diperbarui secara lokal!");
+        }
+        setEditingEkskul(null);
+      };
+
+      const handleAddEkskulSubmit = async (e) => {
+        e.preventDefault();
+        if (!newEkskul.name || !newEkskul.pembina || !newEkskul.groupLink) {
+          triggerToast("Harap lengkapi semua bidang ekskul baru!");
+          return;
+        }
+        const newId = ekskulList.length > 0 ? Math.max(...ekskulList.map(item => item.id)) + 1 : 1;
+        const entry = {
+          id: newId,
+          name: newEkskul.name,
+          pembina: newEkskul.pembina,
+          phone: newEkskul.phone || "6281234567890",
+          groupLink: newEkskul.groupLink,
+          desc: newEkskul.desc || "Ayo asah minat bakat terbaikmu disini!",
+          category: newEkskul.category,
+          jadwal: newEkskul.jadwal || "Sabtu, 10:00 - 12:00 WIB",
+          lokasi: newEkskul.lokasi || "Kampus SMP PGRI Citeureup"
+        };
+
+        if (supabase) {
+          try {
+            const { error } = await supabase.from('ekskulList').insert(entry);
+            if (error) throw error;
+            triggerToast("Ekskul baru sukses ditambahkan ke Database!");
+          } catch (err) {
+            console.error(err);
+            triggerToast("Gagal menyimpan ke Database. Tersimpan lokal.");
+          }
+        } else {
+          setEkskulList([...ekskulList, entry]);
+          triggerToast("Ekskul baru sukses ditambahkan di browser lokal!");
+        }
+        setNewEkskul({ name: '', pembina: '', phone: '', groupLink: '', desc: '', category: 'Olahraga', jadwal: '', lokasi: '' });
+        setShowAddEkskulModal(false);
+      };
+
+      const generateWATemplate = (ekskulName, alasan) => {
+        return `Nama: ${lastSubmission?.nama || selectedApplicant?.nama}\nKelas: ${lastSubmission?.kelas || selectedApplicant?.kelas}\nAlasan: ${alasan}`;
+      };
+
+      const handleGroupRedirect = (ekskulName, groupLink, alasan) => {
+        const messageText = generateWATemplate(ekskulName, alasan);
+
+        const el = document.createElement('textarea');
+        el.value = messageText;
+        document.body.appendChild(el);
+        el.select();
+        document.execCommand('copy');
+        document.body.removeChild(el);
+
+        triggerToast(`Format perkenalan ${ekskulName} disalin! Tempelkan nanti di grup.`);
+        setTimeout(() => { window.open(groupLink, '_blank'); }, 1200);
+      };
+
+      const exportToPDF = () => {
+        const printWindow = window.open('', '_blank');
+        if (!printWindow) {
+          triggerToast('Gagal memicu cetakan laporan. Izinkan pop-up browser Anda!');
+          return;
+        }
+
+        let subTitle = "LAPORAN REKAPITULASI PENDAFTARAN EKSTRAKURIKULER";
+        if (choiceTab === 'pilihan1') subTitle = `LAPORAN PENDAFTARAN PILIHAN 1 (UTAMA) ${selectedFilterEkskul ? `- ${selectedFilterEkskul.toUpperCase()}` : ''}`;
+        else if (choiceTab === 'pilihan2') subTitle = `LAPORAN PENDAFTARAN PILIHAN 2 (KEDUA) ${selectedFilterEkskul ? `- ${selectedFilterEkskul.toUpperCase()}` : ''}`;
+        else if (selectedFilterEkskul) subTitle = `LAPORAN REKAPITULASI EKSTRAKURIKULER - ${selectedFilterEkskul.toUpperCase()}`;
+
+        const tableRows = filteredApplicants.map((app, idx) => `
+          <tr style="border-bottom: 1px solid #e2e8f0;">
+            <td style="padding: 10px; text-align: center; border: 1px solid #cbd5e1;">${idx + 1}</td>
+            <td style="padding: 10px; font-family: monospace; border: 1px solid #cbd5e1;">${app.id}</td>
+            <td style="padding: 10px; font-weight: 600; border: 1px solid #cbd5e1;">${app.nama}</td>
+            <td style="padding: 10px; text-align: center; border: 1px solid #cbd5e1;">${app.kelas}</td>
+            <td style="padding: 10px; border: 1px solid #cbd5e1; ${choiceTab === 'pilihan1' ? 'font-weight: bold; color: #1d4ed8; background: #eff6ff;' : ''}">${app.ekskul1}</td>
+            <td style="padding: 10px; border: 1px solid #cbd5e1; ${choiceTab === 'pilihan2' ? 'font-weight: bold; color: #0369a1; background: #f0f9ff;' : ''}">${app.ekskul2}</td>
+            <td style="padding: 10px; font-family: monospace; border: 1px solid #cbd5e1;">${app.whatsapp}</td>
+            <td style="padding: 10px; text-align: center; border: 1px solid #cbd5e1;">${app.tanggal}</td>
+          </tr>
+        `).join('');
+
+        printWindow.document.write(`
+          <html>
+            <head>
+              <title>Laporan Pendaftaran - SMP PGRI Citeureup</title>
+              <style>
+                body { font-family: 'Arial', sans-serif; padding: 20px; color: #1e293b; line-height: 1.4; }
+                .header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #000; padding-bottom: 15px; }
+                h1 { margin: 0; font-size: 20px; text-transform: uppercase; }
+                h2 { margin: 5px 0; font-size: 13px; color: #1e3a8a; font-weight: bold; text-transform: uppercase; }
+                table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 11px; }
+                th { background-color: #f1f5f9; padding: 10px; border: 1px solid #94a3b8; text-transform: uppercase; font-size: 10px; }
+                td { padding: 8px; border: 1px solid #cbd5e1; }
+                .signature-area { margin-top: 50px; display: flex; justify-content: space-between; }
+                .signature-box { width: 200px; text-align: center; }
+                .signature-line { margin-top: 60px; border-top: 1px solid #000; }
+              </style>
+            </head>
+            <body>
+              <div class="header">
+                <h1>SMP PGRI CITEUREUP</h1>
+                <h2>${subTitle}</h2>
+                <p style="font-size: 11px; margin: 5px 0 0 0;">Tahun Pelajaran: 2026/2027 | Total Data: ${filteredApplicants.length} Siswa | Dicetak: ${new Date().toLocaleDateString('id-ID')}</p>
+              </div>
+              <table>
+                <thead>
+                  <tr><th>No</th><th>ID Register</th><th>Nama Lengkap</th><th>Kelas</th><th>Pilihan 1</th><th>Pilihan 2</th><th>WhatsApp</th><th>Tgl Daftar</th></tr>
+                </thead>
+                <tbody>${tableRows}</tbody>
+              </table>
+              <div class="signature-area">
+                <div class="signature-box"><p>Mengetahui,</p><p>Pembina OSIS</p><div class="signature-line"></div></div>
+                <div class="signature-box"><p>Citeureup, ${new Date().toLocaleDateString('id-ID')}</p><p>Ketua Panitia</p><div class="signature-line"></div></div>
+              </div>
+            </body>
+          </html>
+        `);
+        printWindow.document.close();
+        setTimeout(() => printWindow.print(), 500);
+      };
+
+      const handleCetakBypass = () => {
+        const target = lastSubmission || selectedApplicant;
+        if (!target) return;
+
+        const printWindow = window.open('', '_blank');
+        if (!printWindow) { triggerToast('Gagal memicu cetakan laporan. Izinkan pop-up browser Anda!'); return; }
+
+        printWindow.document.write(`
+          <html>
+            <head>
+              <title>Bukti Registrasi Ekskul - ${target.nama}</title>
+              <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+            </head>
+            <body class="bg-blue-50/30 p-6 flex justify-center items-center">
+              <div class="bg-white border-8 border-double border-blue-800 rounded-[2.5rem] p-8 max-w-xl w-full shadow-2xl">
+                <div class="border-b border-blue-100 pb-3 mb-4">
+                  <h4 class="text-xl font-black text-blue-950">SMP PGRI CITEUREUP</h4>
+                  <p class="text-xs text-blue-600 font-bold mt-1">BUKTI REGISTRASI EKSTRAKURIKULER</p>
+                </div>
+                <div class="space-y-4 text-sm text-slate-800">
+                  <p class="flex justify-between border-b border-blue-50 pb-2"><strong class="text-slate-500">ID Registrasi:</strong> <span class="font-mono font-bold text-blue-800">${target.id}</span></p>
+                  <p class="flex justify-between border-b border-blue-50 pb-2"><strong class="text-slate-500">Nama Lengkap:</strong> <span class="font-bold text-slate-950">${target.nama}</span></p>
+                  <p class="flex justify-between border-b border-blue-50 pb-2"><strong class="text-slate-500">Kelas:</strong> <span class="font-bold text-slate-900">${target.kelas}</span></p>
+                  <p class="flex justify-between border-b border-blue-50 pb-2"><strong class="text-slate-500">Ekskul Pilihan 1:</strong> <span class="font-bold text-blue-800">${target.ekskul1}</span></p>
+                  <p class="flex justify-between border-b border-blue-50 pb-2"><strong class="text-slate-500">Ekskul Pilihan 2:</strong> <span class="font-bold text-sky-800">${target.ekskul2}</span></p>
+                  <p class="flex justify-between border-b border-blue-50 pb-2"><strong class="text-slate-500">Tanggal Daftar:</strong> <span class="font-mono">${target.tanggal}</span></p>
+                </div>
+                <p class="text-[10px] text-center text-slate-400 mt-6 font-bold uppercase tracking-wider">Harap simpan bukti ini and tunjukkan kepada Pembina saat verifikasi.</p>
+              </div>
+            </body>
+          </html>
+        `);
+        printWindow.document.close();
+        setTimeout(() => printWindow.print(), 500);
+      };
+
+      const exportToCSV = () => {
+        const headers = ["No Registrasi", "Nama Siswa", "Kelas", "WhatsApp", "Ekskul 1", "Alasan 1", "Ekskul 2", "Alasan 2", "Tanggal Daftar", "Status"];
+        const rows = filteredApplicants.map(app => [
+          app.id, `"${app.nama}"`, app.kelas, app.whatsapp, `"${app.ekskul1}"`, `"${app.alasan1.replace(/"/g, '""')}"`, `"${app.ekskul2}"`, `"${app.alasan2.replace(/"/g, '""')}"`, app.tanggal, app.status
+        ]);
+        const csvContent = "data:text/csv;charset=utf-8,\uFEFF" + [headers.join(","), ...rows.map(e => e.join(","))].join("\n");
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", `rekap_pendaftaran_${choiceTab}_${selectedFilterEkskul || 'semua'}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      };
+
+      const filteredGalleryEkskul = ekskulList.filter(e =>
+        e.name.toLowerCase().includes(gallerySearch.toLowerCase()) ||
+        e.category.toLowerCase().includes(gallerySearch.toLowerCase()) ||
+        e.pembina.toLowerCase().includes(gallerySearch.toLowerCase())
+      );
+
+      const filteredApplicants = applicants.filter(app => {
+        const matchesSearch = app.nama.toLowerCase().includes(searchTerm.toLowerCase()) || app.id.toLowerCase().includes(searchTerm.toLowerCase());
+        let matchesEkskul = true;
+        if (choiceTab === 'pilihan1') matchesEkskul = selectedFilterEkskul === '' || app.ekskul1 === selectedFilterEkskul;
+        else if (choiceTab === 'pilihan2') matchesEkskul = selectedFilterEkskul === '' || app.ekskul2 === selectedFilterEkskul;
+        else matchesEkskul = selectedFilterEkskul === '' || app.ekskul1 === selectedFilterEkskul || app.ekskul2 === selectedFilterEkskul;
+        const matchesStatus = filterStatus === '' || app.status === filterStatus;
+        return matchesSearch && matchesEkskul && matchesStatus;
+      });
+
+      return (
+        <div className="min-h-screen flex flex-col justify-between bg-slate-50/50 overflow-x-hidden">
+
+          {/* HEADER */}
+          <header className="bg-white/90 text-slate-900 shadow-sm sticky top-0 z-[9999] border-b border-blue-50 backdrop-blur-md smooth-transition">
+            <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+              <div className="flex items-center gap-3 group min-w-0">
+                <div className="bg-gradient-to-tr from-blue-600 to-blue-700 text-white p-2.5 rounded-2xl border border-blue-500/10 shadow flex items-center justify-center shrink-0 smooth-transition group-hover:scale-110 group-hover:rotate-6">
+                  <IconShield className="w-5 h-5 text-white animate-pulse" />
+                </div>
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2">
+                    <h1 className="text-sm sm:text-lg font-black leading-none cursor-pointer tracking-wide text-blue-900 truncate smooth-transition hover:text-blue-700" onClick={resetForm}>SMP PGRI CITEUREUP</h1>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3.5">
+                {syncStatus === 'synced' && (
+                  <span className="hidden md:inline-flex items-center gap-1.5 bg-emerald-50 text-emerald-700 text-[11px] font-bold px-3 py-1 rounded-full border border-emerald-200 shadow-sm">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+                    Database Supabase Aktif
+                  </span>
+                )}
+                {syncStatus === 'connecting' && (
+                  <span className="hidden md:inline-flex items-center gap-1.5 bg-amber-50 text-amber-700 text-[11px] font-bold px-3 py-1 rounded-full border border-amber-200 shadow-sm animate-pulse">
+                    <span className="w-2 h-2 rounded-full bg-amber-400"></span>
+                    Menghubungkan...
+                  </span>
+                )}
+                {syncStatus === 'error' && (
+                  <span className="hidden md:inline-flex items-center gap-1.5 bg-red-50 text-red-700 text-[11px] font-bold px-3 py-1 rounded-full border border-red-200 shadow-sm">
+                    <span className="w-2 h-2 rounded-full bg-red-500"></span>
+                    Mode Local/Offline
+                  </span>
+                )}
+
+                <div className="flex items-center gap-2">
+                  {currentView !== 'landing' && (
+                    <button onClick={resetForm} className="text-xs border border-slate-200 hover:bg-slate-50 text-slate-700 p-2 sm:px-4 sm:py-2 rounded-full flex items-center gap-1.5 smooth-transition font-semibold shadow-sm hover:scale-105 active:scale-95">
+                      <IconHome className="w-4 h-4 sm:w-3.5 sm:h-3.5" /> <span className="hidden sm:inline">Beranda</span>
+                    </button>
+                  )}
+                  {currentView !== 'admin' ? (
+                    <button onClick={() => setCurrentView('admin')} className="text-xs bg-blue-600 hover:bg-blue-700 text-white font-extrabold p-2 sm:px-4 sm:py-2 rounded-full shadow-md flex items-center gap-1.5 smooth-transition hover:scale-105 active:scale-95">
+                      <IconLock className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
+                      <span className="hidden sm:inline">Portal Pembina</span>
+                    </button>
+                  ) : (
+                    <button onClick={() => { setIsAdminAuthenticated(false); resetForm(); }} className="text-xs bg-red-600 hover:bg-red-500 text-white p-2 sm:px-4 sm:py-2 rounded-full flex items-center gap-1.5 smooth-transition hover:scale-105 active:scale-95 shadow-md">
+                      <IconLogOut className="w-4 h-4 sm:w-3.5 sm:h-3.5" /> <span className="hidden sm:inline">Keluar</span>
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+          </header>
+
+          {showToast && (
+            <div className="fixed bottom-4 left-4 right-4 md:left-auto md:right-5 md:bottom-5 z-[999999] bg-slate-900/95 backdrop-blur-md text-white pl-6 pr-5 py-3.5 rounded-2xl shadow-2xl border border-slate-800/80 flex items-center gap-3.5 max-w-full md:max-w-sm animate-scale-in">
+              <IconInfo className="text-blue-400 w-5 h-5 flex-shrink-0 animate-bounce" />
+              <span className="text-xs font-semibold leading-snug">{toastMessage}</span>
+            </div>
+          )}
+
+          {/* WARNING HELPER: Ditampilkan jika kunci API Supabase belum dikonfigurasi */}
+          {SUPABASE_ANON_KEY === 'YOUR_SUPABASE_ANON_KEY' && (
+            <div className="bg-amber-50 border-b border-amber-200 text-amber-800 px-4 py-3 text-xs text-center font-medium">
+              ⚠️ <strong>Supabase Belum Aktif:</strong> Silakan ganti <code className="bg-amber-100 px-1 py-0.5 rounded font-mono">YOUR_SUPABASE_ANON_KEY</code> di dalam kode dengan Anon Key dari proyek Anda agar fitur Cloud Database dapat bekerja!
+            </div>
+          )}
+
+          {/* MAIN CONTAINER */}
+          <main className="flex-grow flex items-center justify-center py-6">
+
+            {/* VIEW: LANDING PAGE */}
+            {currentView === 'landing' && (
+              <div className="w-full max-w-7xl mx-auto px-4 py-10 space-y-16 animate-fade-in-up">
+                <div className="text-center space-y-8 max-w-4xl mx-auto">
+                  <div className="bg-gradient-to-tr from-blue-50 to-blue-100 p-6 rounded-full border-4 border-white shadow-md relative w-28 h-28 mx-auto flex items-center justify-center animate-float animate-pulse-slow">
+                    <IconShield className="w-14 h-14 text-blue-600" />
+                  </div>
+                  <div className="space-y-4">
+                    <h2 className="text-3xl md:text-5xl font-extrabold text-slate-900 leading-tight tracking-tight">Kembangkan Minat, Bakat & Karakter Unggulmu!</h2>
+                    <p className="text-sm md:text-base text-slate-600 max-w-2xl mx-auto leading-relaxed">
+                      Selamat datang di Portal Pendaftaran Ekstrakurikuler resmi <span className="font-bold text-blue-900">SMP PGRI Citeureup</span>.
+                      Silakan ikuti instruksi pengisian dengan memilih tepat <span className="font-bold text-blue-600">2 program ekstrakurikuler</span> yang paling Anda minati.
+                    </p>
+                  </div>
+                  <div className="flex flex-col sm:flex-row justify-center gap-4 pt-4">
+                    <button onClick={() => { setCurrentView('form'); setFormStep(1); }} className="bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-base px-8 py-4 rounded-2xl shadow-lg hover:shadow-xl smooth-transition hover:scale-[1.05] active:scale-95 duration-200">
+                      Mulai Pendaftaran Online
+                    </button>
+                  </div>
+                </div>
+
+                <div className="space-y-6 pt-10 border-t border-slate-200/80">
+                  <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+                    <div>
+                      <h3 className="text-2xl font-extrabold text-slate-900">Program Pilihan Ekstrakurikuler ({ekskulList.length} Ekskul)</h3>
+                    </div>
+                    <div className="w-full md:w-80 relative">
+                      <span className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-slate-400"><IconSearch className="w-4 h-4" /></span>
+                      <input type="text" placeholder="Cari ekskul, pembina, atau kategori..." value={gallerySearch} onChange={(e) => setGallerySearch(e.target.value)} className="w-full border border-slate-200 rounded-full pl-10 pr-4 py-2.5 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent smooth-transition hover:border-blue-300" />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-start">
+                    {filteredGalleryEkskul.map((e, index) => {
+                      const isExpanded = expandedEkskulId === e.id;
+                      return (
+                        <div key={e.id} style={{ animationDelay: `${index * 50}ms` }} onClick={() => setExpandedEkskulId(isExpanded ? null : e.id)} className={`bg-white rounded-[2rem] shadow-sm border p-6 flex flex-col justify-between smooth-transition card-hover-effect cursor-pointer animate-fade-in-up ${isExpanded ? 'ring-2 ring-blue-500 border-blue-300 bg-blue-50/10' : 'border-slate-100'}`}>
+                          <div className="space-y-3.5">
+                            <div className="flex justify-between items-center">
+                              <span className={`px-3 py-1 rounded-full text-[10px] font-black border tracking-wide uppercase ${KATEGORI_COLORS[e.category] || "bg-slate-100 text-slate-800"}`}>{e.category}</span>
+                              <span className="text-[11px] text-slate-400 font-bold font-mono">ID: {String(e.id).padStart(2, '0')}</span>
+                            </div>
+                            <h4 className="text-lg font-bold text-slate-900 group-hover:text-blue-600 transition-colors flex items-center justify-between">
+                              <span>{e.name}</span>
+                              <svg className={`w-5 h-5 text-blue-500 transform transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 9l-7 7-7-7" /></svg>
+                            </h4>
+                            <p className="text-xs leading-relaxed text-slate-600 line-clamp-3">{e.desc}</p>
+                          </div>
+
+                          <div className="mt-4 pt-3.5 border-t border-slate-100 flex justify-between items-center text-xs">
+                            <span className="text-slate-500">Pembina: <strong className="text-slate-800 font-semibold">{e.pembina}</strong></span>
+                            <span className="text-blue-600 font-extrabold hover:underline">Detail {isExpanded ? 'Tutup' : 'Buka'}</span>
+                          </div>
+
+                          <div className={`grid transition-all duration-500 ease-in-out ${isExpanded ? 'grid-rows-[1fr] opacity-100 mt-5 pt-4 border-t border-blue-100/70' : 'grid-rows-[0fr] opacity-0 mt-0 pt-0 border-t-0 pointer-events-none'}`} onClick={(evt) => evt.stopPropagation()}>
+                            <div className="overflow-hidden space-y-4">
+                              <div className="bg-blue-50/60 rounded-2xl p-4 space-y-3.5 border border-blue-100/30">
+                                <div className="flex items-center gap-2.5 text-xs text-slate-700">
+                                  <div className="bg-blue-100 p-1.5 rounded-lg text-blue-700 shrink-0"><IconCalendar className="w-4 h-4" /></div>
+                                  <div><span className="block text-[10px] text-slate-400 uppercase font-black tracking-wider">Jadwal Latihan</span><strong className="text-slate-800 font-bold">{e.jadwal || "-"}</strong></div>
+                                </div>
+                                <div className="flex items-center gap-2.5 text-xs text-slate-700">
+                                  <div className="bg-blue-100 p-1.5 rounded-lg text-blue-700 shrink-0"><IconLocation className="w-4 h-4" /></div>
+                                  <div><span className="block text-[10px] text-slate-400 uppercase font-black tracking-wider">Lokasi Kegiatan</span><strong className="text-slate-800 font-bold">{e.lokasi || "-"}</strong></div>
+                                </div>
+                              </div>
+                              <div className="flex gap-2">
+                                <button onClick={() => handleGroupRedirect(e.name, e.groupLink, "Tertarik bergabung")} className="w-1/2 bg-slate-100 hover:bg-slate-200 text-slate-800 py-3 rounded-full text-xs font-black text-center smooth-transition hover:scale-105 active:scale-95 shadow-sm">Hubungi Pembina</button>
+                                <button onClick={() => handleFastRegister(e.name)} className="w-1/2 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-full text-xs font-black text-center smooth-transition hover:scale-105 active:scale-95 shadow-md">Daftar Ekskul Ini</button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* VIEW: FORM */}
+            {currentView === 'form' && (
+              <div className="max-w-2xl w-full mx-auto px-4 py-4 animate-fade-in-up">
+                <div className="bg-white rounded-[2.5rem] shadow-md border border-slate-100 p-6 sm:p-8 space-y-6">
+                  <div className="flex justify-between items-center mb-6 px-4">
+                    {[1, 2, 3].map((step) => (
+                      <div key={step} className="flex items-center flex-1 last:flex-initial">
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs smooth-transition ${formStep >= step ? 'bg-blue-600 text-white scale-110 shadow' : 'bg-slate-100 text-slate-400'}`}>{step}</div>
+                        {step < 3 && <div className={`h-1 flex-grow mx-2 rounded smooth-transition ${formStep > step ? 'bg-blue-600' : 'bg-slate-100'}`} />}
+                      </div>
+                    ))}
+                  </div>
+
+                  {formStep === 1 && (
+                    <div className="space-y-5 animate-scale-in">
+                      <h4 className="text-lg font-black text-slate-900 border-b border-slate-100 pb-3 flex items-center gap-2">
+                        <span className="w-1.5 h-6 bg-blue-600 rounded-full animate-pulse"></span>Langkah 1: Identitas
+                      </h4>
+                      <div>
+                        <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5 ml-2">Nama Lengkap <span className="text-red-500">*</span></label>
+                        <input type="text" name="nama" value={formData.nama} onChange={handleInputChange} placeholder="Nama lengkap..." className="w-full border border-slate-200 rounded-full px-5 py-3.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" required />
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5 ml-2">Kelas <span className="text-red-500">*</span></label>
+                          <select name="kelas" value={formData.kelas} onChange={handleInputChange} className="w-full border border-slate-200 rounded-full px-5 py-3.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none" required>
+                            <option value="">-- Pilih --</option>
+                            {KELAS_OPTIONS.map(c => <option key={c} value={c}>{c}</option>)}
+                          </select>
+                        </div>
+                        <div>
+                          <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5 ml-2">WhatsApp <span className="text-red-500">*</span></label>
+                          <input type="tel" name="whatsapp" value={formData.whatsapp} onChange={handleInputChange} placeholder="0812345..." className="w-full border border-slate-200 rounded-full px-5 py-3.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" required />
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5 ml-2">Jenis Kelamin <span className="text-red-500">*</span></label>
+                        <select name="gender" value={formData.gender} onChange={handleInputChange} className="w-full border border-slate-200 rounded-full px-5 py-3.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none" required>
+                          <option value="">-- Pilih --</option><option value="Laki-laki">Laki-laki</option><option value="Perempuan">Perempuan</option>
+                        </select>
+                      </div>
+                      <button onClick={nextStep} className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-6 rounded-full text-sm shadow-md smooth-transition hover:scale-[1.02] active:scale-95">Lanjut</button>
+                    </div>
+                  )}
+
+                  {formStep === 2 && (
+                    <div className="space-y-6 animate-scale-in">
+                      <h4 className="text-lg font-black text-slate-900 border-b border-slate-100 pb-3 flex items-center gap-2">
+                        <span className="w-1.5 h-6 bg-blue-600 rounded-full animate-pulse"></span>Langkah 2: Pilih Ekskul
+                      </h4>
+                      <div className="space-y-4">
+                        <div className="space-y-3">
+                          <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1 ml-2">Pilihan 1 (Utama) <span className="text-red-500">*</span></label>
+                          <select name="ekskul1" value={formData.ekskul1} onChange={handleInputChange} className="w-full border border-slate-200 rounded-full px-5 py-3.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none" required>
+                            <option value="">-- Pilih Ekskul Utama --</option>
+                            {ekskulList.map(e => <option key={e.id} value={e.name}>{e.name} - [{e.category}]</option>)}
+                          </select>
+                          <textarea name="alasan1" value={formData.alasan1} onChange={handleInputChange} placeholder="Alasan memilih..." className="w-full border border-slate-200 rounded-2xl px-5 py-3 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none" rows="2" required />
+                        </div>
+                        <div className="space-y-3">
+                          <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1 ml-2">Pilihan 2 (Kedua) <span className="text-red-500">*</span></label>
+                          <select name="ekskul2" value={formData.ekskul2} onChange={handleInputChange} className="w-full border border-slate-200 rounded-full px-5 py-3.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none" required>
+                            <option value="">-- Pilih Ekskul Kedua --</option>
+                            {ekskulList.map(e => <option key={e.id} value={e.name}>{e.name} - [{e.category}]</option>)}
+                          </select>
+                          <textarea name="alasan2" value={formData.alasan2} onChange={handleInputChange} placeholder="Alasan memilih..." className="w-full border border-slate-200 rounded-2xl px-5 py-3 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none" rows="2" required />
+                        </div>
+                      </div>
+                      <div className="flex gap-3 pt-3">
+                        <button onClick={prevStep} className="w-1/3 border border-slate-200 hover:bg-slate-50 text-slate-600 font-bold py-3.5 px-6 rounded-full text-sm smooth-transition">Kembali</button>
+                        <button onClick={nextStep} className="w-2/3 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 px-6 rounded-full text-sm shadow-sm smooth-transition">Tinjau</button>
+                      </div>
+                    </div>
+                  )}
+
+                  {formStep === 3 && (
+                    <div className="space-y-5 animate-scale-in">
+                      <h4 className="text-lg font-black text-slate-900 border-b border-slate-100 pb-3 flex items-center gap-2">
+                        <span className="w-1.5 h-6 bg-blue-600 rounded-full animate-pulse"></span>Langkah 3: Konfirmasi
+                      </h4>
+                      <div className="border border-slate-100 rounded-[2rem] overflow-hidden shadow-sm bg-slate-50/50 p-6">
+                        <div className="space-y-3 text-xs sm:text-sm">
+                          <p className="flex justify-between border-b pb-2.5"><strong className="text-slate-500">Nama:</strong> <span className="font-semibold text-slate-800">{formData.nama}</span></p>
+                          <p className="flex justify-between border-b pb-2.5"><strong className="text-slate-500">Kelas:</strong> <span className="font-semibold text-slate-800">{formData.kelas}</span></p>
+                          <p className="flex justify-between border-b pb-2.5"><strong className="text-slate-500">Ekskul 1:</strong> <span className="font-bold text-blue-700">{formData.ekskul1}</span></p>
+                          <p className="flex justify-between border-b pb-2.5"><strong className="text-slate-500">Ekskul 2:</strong> <span className="font-bold text-sky-700">{formData.ekskul2}</span></p>
+                        </div>
+                      </div>
+                      <div className="bg-blue-50/50 border border-blue-100 p-4 rounded-2xl">
+                        <label className="flex items-start gap-3 cursor-pointer">
+                          <input type="checkbox" name="pernyataan" checked={formData.pernyataan} onChange={handleInputChange} className="mt-1" required />
+                          <span className="text-xs text-slate-600 font-medium">Saya bersedia mengikuti seluruh peraturan ekstrakurikuler.</span>
+                        </label>
+                      </div>
+                      <div className="flex gap-3 pt-3">
+                        <button onClick={prevStep} className="w-1/3 border border-slate-200 hover:bg-slate-50 text-slate-600 font-bold py-3.5 px-6 rounded-full text-sm smooth-transition">Kembali</button>
+                        <button onClick={handleSubmit} className="w-2/3 bg-blue-900 hover:bg-blue-950 text-white font-extrabold py-3.5 px-6 rounded-full text-sm shadow-md smooth-transition">Kirim</button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* VIEW: SUCCESS */}
+            {currentView === 'success' && lastSubmission && (
+              <div className="max-w-xl w-full mx-auto py-8 px-4 text-center space-y-6 animate-scale-in">
+                <div className="bg-white p-8 border border-slate-100 rounded-[2.5rem] shadow-xl space-y-6">
+                  <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto text-blue-600 animate-float"><IconShield className="w-8 h-8 animate-pulse" /></div>
+                  <h3 className="text-2xl font-black text-blue-900 animate-bounce">Pendaftaran Berhasil!</h3>
+                  <div className="space-y-3">
+                    <button onClick={() => handleGroupRedirect(lastSubmission.ekskul1, ekskulList.find(e => e.name === lastSubmission.ekskul1)?.groupLink, lastSubmission.alasan1)} className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3.5 rounded-full text-xs font-black shadow-md">Gabung Grup WA 1: {lastSubmission.ekskul1}</button>
+                    <button onClick={() => handleGroupRedirect(lastSubmission.ekskul2, ekskulList.find(e => e.name === lastSubmission.ekskul2)?.groupLink, lastSubmission.alasan2)} className="w-full bg-slate-800 hover:bg-slate-950 text-white py-3.5 rounded-full text-xs font-black shadow-md">Gabung Grup WA 2: {lastSubmission.ekskul2}</button>
+                    <button onClick={handleCetakBypass} className="w-full border border-slate-200 hover:bg-slate-50 text-slate-700 py-3 rounded-full text-xs font-extrabold flex items-center justify-center gap-1.5"><IconPrinter className="w-4 h-4 text-slate-500" /> Cetak Bukti Pendaftaran</button>
+                    <button onClick={resetForm} className="text-xs text-slate-400 hover:text-blue-800 underline block mx-auto pt-2">Kembali ke Beranda</button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* VIEW: ADMIN PANEL */}
+            {currentView === 'admin' && (
+              <div className="max-w-7xl w-full mx-auto py-6 px-4">
+                {!isAdminAuthenticated ? (
+                  <form onSubmit={handleAdminLoginSubmit} className="max-w-md mx-auto bg-white p-8 border rounded-[2.5rem] shadow-md space-y-6 animate-scale-in">
+                    <div className="text-center space-y-2">
+                      <div className="bg-blue-50 text-blue-800 rounded-full w-12 h-12 flex items-center justify-center mx-auto"><IconLock className="w-6 h-6 animate-pulse" /></div>
+                      <h3 className="font-black text-lg text-slate-900">Portal Pembina</h3>
+                    </div>
+                    <div>
+                      <input type="password" placeholder="Password: pembinaosis2026" value={adminPassword} onChange={(e) => setAdminPassword(e.target.value)} className="w-full border border-slate-200 rounded-full px-4 py-3 text-sm text-center font-mono focus:ring-2 focus:ring-blue-500" required />
+                      {adminError && <p className="text-red-500 text-xs font-semibold text-center mt-2">{adminError}</p>}
+                    </div>
+                    <button type="submit" className="w-full bg-blue-900 hover:bg-blue-950 text-white py-3.5 rounded-full text-xs font-black">Masuk</button>
+                  </form>
+                ) : (
+                  <div className="space-y-6 animate-fade-in-up">
+                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white p-6 border rounded-[2rem] shadow-sm">
+                      <div>
+                        <h3 className="font-extrabold text-xl flex items-center gap-2"><IconShield className="text-blue-700" /> Dashboard Kontrol (Supabase)</h3>
+                      </div>
+                      <div className="flex gap-2 flex-wrap">
+                        {adminTab === 'ekskul' && <button onClick={() => setShowAddEkskulModal(true)} className="bg-blue-600 text-white px-5 py-2.5 rounded-full text-xs font-black"><IconPlus className="inline w-4 h-4" /> Tambah Ekskul</button>}
+                        <button onClick={exportToCSV} className="bg-slate-800 text-white px-5 py-2.5 rounded-full text-xs font-black"><IconDownload className="inline w-4 h-4" /> CSV</button>
+                        <button onClick={exportToPDF} className="bg-blue-900 text-white px-5 py-2.5 rounded-full text-xs font-black"><IconPrinter className="inline w-4 h-4" /> Cetak</button>
+                      </div>
+                    </div>
+
+                    <div className="flex gap-2 border-b border-slate-200">
+                      <button onClick={() => setAdminTab('data')} className={`px-5 py-3 text-xs font-extrabold border-b-2 ${adminTab === 'data' ? 'border-blue-600 text-blue-700' : 'border-transparent text-slate-500'}`}>Data Pendaftar ({filteredApplicants.length})</button>
+                      <button onClick={() => setAdminTab('ekskul')} className={`px-5 py-3 text-xs font-extrabold border-b-2 ${adminTab === 'ekskul' ? 'border-blue-600 text-blue-700' : 'border-transparent text-slate-500'}`}>Kelola Ekskul ({ekskulList.length})</button>
+                    </div>
+
+                    {adminTab === 'data' && (
+                      <div className="space-y-4">
+                        {/* PILIHAN TAB FILTER & CARI */}
+                        <div className="bg-white p-5 border border-slate-100 rounded-[2rem] shadow-sm flex flex-col gap-4">
+                          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                            <div className="space-y-1">
+                              <span className="text-[10px] uppercase font-black text-slate-400 tracking-wider">Kategori Pemisahan Data</span>
+                              <div className="flex bg-slate-100 p-1 rounded-xl w-full max-w-md">
+                                <button onClick={() => { setChoiceTab('all'); setSelectedFilterEkskul(''); }} className={`flex-1 text-center py-2 text-xs font-black rounded-lg transition-all ${choiceTab === 'all' ? 'bg-white text-blue-900 shadow-sm' : 'text-slate-500 hover:text-slate-800'}`}>Semua Pilihan</button>
+                                <button onClick={() => { setChoiceTab('pilihan1'); setSelectedFilterEkskul(''); }} className={`flex-1 text-center py-2 text-xs font-black rounded-lg transition-all ${choiceTab === 'pilihan1' ? 'bg-white text-blue-900 shadow-sm' : 'text-slate-500 hover:text-slate-800'}`}>Pilihan 1 (Utama)</button>
+                                <button onClick={() => { setChoiceTab('pilihan2'); setSelectedFilterEkskul(''); }} className={`flex-1 text-center py-2 text-xs font-black rounded-lg transition-all ${choiceTab === 'pilihan2' ? 'bg-white text-blue-900 shadow-sm' : 'text-slate-500 hover:text-slate-800'}`}>Pilihan 2 (Kedua)</button>
+                              </div>
+                            </div>
+
+                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 items-end">
+                              <div className="space-y-1">
+                                <label className="text-[10px] font-bold uppercase text-slate-400">Cari Siswa</label>
+                                <div className="relative">
+                                  <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400"><IconSearch className="w-3.5 h-3.5" /></span>
+                                  <input type="text" placeholder="Nama / No Registrasi..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="w-full pl-9 pr-3 py-2 text-xs border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 bg-slate-50/50" />
+                                </div>
+                              </div>
+
+                              <div className="space-y-1">
+                                <label className="text-[10px] font-bold uppercase text-slate-400">Filter Ekskul</label>
+                                <select value={selectedFilterEkskul} onChange={(e) => setSelectedFilterEkskul(e.target.value)} className="w-full px-3 py-2 text-xs border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white font-semibold text-slate-700 appearance-none">
+                                  <option value="">-- Tampilkan Semua --</option>
+                                  {ekskulList.map(e => <option key={e.id} value={e.name}>{e.name}</option>)}
+                                </select>
+                              </div>
+
+                              {(searchTerm !== '' || selectedFilterEkskul !== '') && (
+                                <button onClick={() => { setSearchTerm(''); setSelectedFilterEkskul(''); }} className="text-xs bg-red-50 hover:bg-red-100 text-red-600 font-extrabold py-2 px-4 rounded-full border border-red-200">Reset</button>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* TABLE CONTAINER */}
+                        <div className="bg-white border border-slate-200 rounded-[2rem] shadow-sm overflow-hidden animate-scale-in">
+                          <div className="overflow-x-auto">
+                            <table className="w-full text-left text-xs">
+                              <thead>
+                                <tr className="bg-slate-50 text-slate-600 uppercase font-bold border-b">
+                                  <th className="p-4 text-center">No</th><th className="p-4">No Reg</th><th className="p-4">Nama</th><th className="p-4">Kelas</th><th className="p-4">Ekskul 1</th><th className="p-4">Ekskul 2</th><th className="p-4 text-center">Aksi</th>
+                                </tr>
+                              </thead>
+                              <tbody className="divide-y divide-slate-100">
+                                {filteredApplicants.length > 0 ? filteredApplicants.map((app, index) => (
+                                  <tr key={app.id} className="hover:bg-slate-50/50 smooth-transition">
+                                    <td className="p-4 text-center text-slate-400">{index + 1}</td><td className="p-4 font-mono font-bold text-slate-800">{app.id}</td><td className="p-4 font-black text-slate-900">{app.nama}</td><td className="p-4 font-semibold">{app.kelas}</td><td className={`p-4 font-bold text-blue-700`}>{app.ekskul1}</td><td className={`p-4 font-bold text-sky-700`}>{app.ekskul2}</td>
+                                    <td className="p-4 text-center flex items-center justify-center gap-2">
+                                      <button onClick={() => setSelectedApplicant(app)} className="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3.5 py-1.5 rounded-full text-[10px] font-bold flex items-center gap-1"><IconEye className="w-3.5 h-3.5" /> Detail</button>
+                                      <button onClick={() => setDeletingApplicantId(app.id)} className="text-red-500 hover:text-red-700 p-1.5 hover:bg-red-50 rounded-full"><IconTrash className="w-4 h-4" /></button>
+                                    </td>
+                                  </tr>
+                                )) : (
+                                  <tr><td colSpan="7" className="p-12 text-center text-slate-400 font-semibold">Tidak ada data.</td></tr>
+                                )}
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {adminTab === 'ekskul' && (
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 animate-scale-in">
+                        {ekskulList.map((e, index) => (
+                          <div key={e.id} className="bg-white p-5 border border-slate-200 rounded-[2rem] shadow-sm flex flex-col justify-between gap-4 card-hover-effect smooth-transition">
+                            <div>
+                              <div className="flex justify-between items-start">
+                                <span className={`px-2.5 py-1 rounded-full text-[10px] font-black border uppercase ${KATEGORI_COLORS[e.category] || "bg-slate-100"}`}>{e.category}</span>
+                                <button onClick={() => setEditingEkskul(e)} className="text-blue-600 hover:text-blue-800 p-1.5 bg-blue-50 rounded-full"><IconEdit className="w-4 h-4" /></button>
+                              </div>
+                              <h4 className="font-black text-base text-slate-900 mt-2">{e.name}</h4>
+                              <p className="text-xs text-slate-500 mt-1 line-clamp-2">{e.desc}</p>
+                            </div>
+                            <div className="border-t border-slate-100 pt-3 text-xs space-y-1">
+                              <p><strong className="text-slate-600">Pembina:</strong> {e.pembina}</p>
+                              <p><strong className="text-slate-600">Lokasi:</strong> {e.lokasi || "-"}</p>
+                              <p className="text-[11px] text-blue-600 font-semibold truncate" title={e.groupLink}>{e.groupLink}</p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+          </main>
+
+          {/* MODAL TAMBAH EKSKUL */}
+          {showAddEkskulModal && (
+            <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[99999] flex items-center justify-center p-4">
+              <div className="bg-white rounded-[2.5rem] max-w-md w-full p-6 space-y-4 shadow-2xl relative">
+                <button onClick={() => setShowAddEkskulModal(false)} className="absolute top-4 right-4 text-slate-400 hover:text-slate-600"><IconX className="w-6 h-6" /></button>
+                <h4 className="text-lg font-black text-slate-900 border-b pb-2">Tambah Ekskul Baru</h4>
+                <form onSubmit={handleAddEkskulSubmit} className="space-y-3.5 text-xs">
+                  <div><label className="block font-bold text-slate-700 mb-1">Nama Ekskul</label><input type="text" value={newEkskul.name} onChange={(e) => setNewEkskul({ ...newEkskul, name: e.target.value })} className="w-full border rounded-full px-4 py-2.5" required /></div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div><label className="block font-bold text-slate-700 mb-1">Pembina</label><input type="text" value={newEkskul.pembina} onChange={(e) => setNewEkskul({ ...newEkskul, pembina: e.target.value })} className="w-full border rounded-full px-4 py-2.5" required /></div>
+                    <div>
+                      <label className="block font-bold mb-1">Kategori</label>
+                      <select value={newEkskul.category} onChange={(e) => setNewEkskul({ ...newEkskul, category: e.target.value })} className="w-full border bg-white rounded-full px-4 py-2.5">
+                        {Object.keys(KATEGORI_COLORS).map(cat => <option key={cat} value={cat}>{cat}</option>)}
+                      </select>
+                    </div>
+                  </div>
+                  <div><label className="block font-bold mb-1">Link Grup WA</label><input type="url" value={newEkskul.groupLink} onChange={(e) => setNewEkskul({ ...newEkskul, groupLink: e.target.value })} className="w-full border rounded-full px-4 py-2.5" required /></div>
+                  <div><label className="block font-bold mb-1">Deskripsi Singkat</label><textarea rows="2" placeholder="Tuliskan gambaran umum..." value={newEkskul.desc} onChange={(e) => setNewEkskul({ ...newEkskul, desc: e.target.value })} className="w-full border rounded-2xl px-4 py-2.5 resize-none" /></div>
+                  <div className="flex gap-2 pt-2">
+                    <button type="button" onClick={() => setShowAddEkskulModal(false)} className="w-1/2 border py-3 rounded-full font-semibold">Batal</button>
+                    <button type="submit" className="w-1/2 bg-blue-900 text-white font-bold py-3 rounded-full">Simpan</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          )}
+
+          {/* MODAL EDIT EKSKUL */}
+          {editingEkskul && (
+            <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[99999] flex items-center justify-center p-4">
+              <form onSubmit={saveEkskulEdit} className="bg-white rounded-[2.5rem] max-w-md w-full p-6 space-y-4 shadow-2xl relative">
+                <button type="button" onClick={() => setEditingEkskul(null)} className="absolute top-4 right-4 text-slate-400 hover:text-slate-600"><IconX className="w-6 h-6" /></button>
+                <h4 className="text-base font-black border-b pb-2">Ubah Data Ekstrakurikuler</h4>
+                <div className="space-y-3.5 text-xs">
+                  <div><label className="block font-bold mb-1">Nama Ekskul</label><input type="text" value={editingEkskul.name} onChange={(e) => setEditingEkskul({ ...editingEkskul, name: e.target.value })} className="w-full border rounded-full px-4 py-2.5" required /></div>
+                  <div><label className="block font-bold mb-1">Guru Pembina</label><input type="text" value={editingEkskul.pembina} onChange={(e) => setEditingEkskul({ ...editingEkskul, pembina: e.target.value })} className="w-full border rounded-full px-4 py-2.5" required /></div>
+                  <div><label className="block font-bold mb-1">Grup WA</label><input type="url" value={editingEkskul.groupLink} onChange={(e) => setEditingEkskul({ ...editingEkskul, groupLink: e.target.value })} className="w-full border rounded-full px-4 py-2.5" required /></div>
+                </div>
+                <div className="flex gap-2 pt-2">
+                  <button type="button" onClick={() => setEditingEkskul(null)} className="w-1/2 border py-3 rounded-full text-xs font-semibold">Batal</button>
+                  <button type="submit" className="w-1/2 bg-blue-900 text-white py-3 rounded-full text-xs font-bold">Simpan</button>
+                </div>
+              </form>
+            </div>
+          )}
+
+          {/* MODAL DELETE */}
+          {deletingApplicantId && (
+            <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[99999] flex items-center justify-center p-4">
+              <div className="bg-white rounded-[2rem] max-w-sm w-full p-6 space-y-4 shadow-2xl">
+                <h4 className="text-base font-black text-slate-900">Konfirmasi Hapus</h4>
+                <p className="text-xs text-slate-500">Hapus data pendaftar ID <strong className="text-blue-800">{deletingApplicantId}</strong>?</p>
+                <div className="flex gap-2 pt-2">
+                  <button onClick={() => setDeletingApplicantId(null)} className="w-1/2 border py-3 rounded-full text-xs font-semibold">Batal</button>
+                  <button onClick={() => deleteApplicantConfirm(deletingApplicantId)} className="w-1/2 bg-red-600 text-white py-3 rounded-full text-xs font-bold">Hapus</button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* MODAL DETAIL */}
+          {selectedApplicant && (
+            <div className="fixed inset-0 bg-black/65 backdrop-blur-sm flex items-center justify-center p-4 z-[99999] smooth-transition">
+              <div className="bg-white rounded-[2rem] max-w-xl w-full p-6 shadow-2xl border border-slate-100 overflow-y-auto max-h-[90vh] animate-scale-in">
+                <div className="flex justify-between items-center mb-4 border-b pb-3 border-slate-100">
+                  <div>
+                    <h3 className="font-bold text-lg text-blue-950">Detail Pendaftar</h3>
+                    <p className="text-xs text-slate-500 mt-0.5">ID: {selectedApplicant.id} | Tanggal: {selectedApplicant.tanggal}</p>
+                  </div>
+                  <button type="button" onClick={() => setSelectedApplicant(null)} className="text-slate-400 hover:text-slate-600 p-1.5 rounded-full hover:bg-slate-100 smooth-transition hover:rotate-90">
+                    <IconX className="w-5 h-5" />
+                  </button>
+                </div>
+                <div className="space-y-4 text-sm">
+                  <div className="bg-slate-50 p-4 rounded-2xl grid grid-cols-2 gap-3 border border-slate-100">
+                    <div><strong className="text-slate-500 block text-xs uppercase tracking-wider">Nama Lengkap</strong> <span className="text-slate-900 font-bold">{selectedApplicant.nama}</span></div>
+                    <div><strong className="text-slate-500 block text-xs uppercase tracking-wider">Kelas</strong> <span className="text-slate-900 font-bold">{selectedApplicant.kelas}</span></div>
+                    <div className="col-span-2"><strong className="text-slate-500 block text-xs uppercase tracking-wider">WhatsApp</strong> <span className="text-blue-800 font-bold font-mono">{selectedApplicant.whatsapp}</span></div>
+                  </div>
+                  <div className="space-y-3">
+                    <div className="p-4 bg-blue-50/50 rounded-2xl border border-blue-100">
+                      <strong className="text-xs text-blue-800 uppercase block font-black tracking-wide">Ekskul Utama</strong>
+                      <span className="font-black text-slate-900 text-sm mt-0.5 block">{selectedApplicant.ekskul1}</span>
+                      <p className="text-slate-600 text-xs mt-2 italic font-medium bg-white p-2.5 rounded-xl border border-slate-100">"{selectedApplicant.alasan1}"</p>
+                    </div>
+                    <div className="p-4 bg-sky-50/40 rounded-2xl border border-sky-100">
+                      <strong className="text-xs text-sky-800 uppercase block font-black tracking-wide">Ekskul Kedua</strong>
+                      <span className="font-black text-slate-900 text-sm mt-0.5 block">{selectedApplicant.ekskul2}</span>
+                      <p className="text-slate-600 text-xs mt-2 italic font-medium bg-white p-2.5 rounded-xl border border-slate-100">"{selectedApplicant.alasan2}"</p>
+                    </div>
+                  </div>
+                  <div className="pt-4 border-t border-slate-100 flex gap-2.5 justify-end">
+                    <button type="button" onClick={handleCetakBypass} className="px-5 py-2.5 bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold rounded-full transition shadow flex items-center gap-1.5 smooth-transition hover:scale-105 active:scale-95">
+                      <IconPrinter className="w-3.5 h-3.5" /> Cetak Bukti PDF
+                    </button>
+                    <button type="button" onClick={() => setSelectedApplicant(null)} className="px-5 py-2.5 text-xs font-bold text-white bg-blue-900 rounded-full hover:bg-blue-950 transition smooth-transition hover:scale-105 active:scale-95">
+                      Tutup Detail
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          <footer className="w-full px-4 pb-6 pt-2">
+            <div className="bg-blue-950 text-white py-6 px-4 max-w-7xl mx-auto rounded-2xl sm:rounded-[2rem] border border-blue-900/50 shadow-xl text-center space-y-2 smooth-transition hover:shadow-2xl">
+              <p className="text-[11px] sm:text-xs font-bold text-slate-300">© 2026 SMP PGRI Citeureup. Hak Cipta Dilindungi.</p>
+              <p className="text-[9px] sm:text-[10px] text-slate-400 max-w-md mx-auto leading-relaxed">
+                Dikembangkan oleh OSIS & MPK SMP PGRI Citeureup - Agent 66.
+              </p>
+            </div>
+          </footer>
+        </div>
+      );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+</body>
+
+</html>
